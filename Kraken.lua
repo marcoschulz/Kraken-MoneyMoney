@@ -25,7 +25,7 @@
 -- SOFTWARE.
 
 WebBanking{
-  version = 1.08,
+  version = 1.09,
   url = "https://api.kraken.com",
   description = "Fetch balances from Kraken API and list them as securities",
   services= { "Kraken Account" },
@@ -38,6 +38,7 @@ local currency = "EUR" -- fixme: Don't hardcode
 local currencyName = "ZEUR" -- fixme: Don't hardcode
 local stakeSuffix = '.S'
 local bitcoin = 'XXBT'
+local bitcoin_staked = 'XBT.M'
 local ethereum = 'XETH'
 local market = "Kraken"
 local accountName = "Balances"
@@ -162,6 +163,10 @@ end
 
 function resolveCurrencyName(key)
 
+  if (key == bitcoin_staked) then
+    key = bitcoin .. stakeSuffix
+  end
+  
   local keyWithoutSuffix = removeSuffix(key, stakeSuffix)
   local isStaked = key ~= keyWithoutSuffix
 
@@ -256,6 +261,10 @@ function buildPairs(balances, assetPairs)
 end
 
 function getPairInfo(base)
+  -- support for staked bitcoin (convert symbol so that it could be found in asset pairs)
+  if (base == bitcoin_staked) then
+    base = bitcoin
+  end
 
   -- support for staked coins (cut off stakeSuffix so that the currency can be found in asset pairs)
   base = removeSuffix(base, stakeSuffix)
